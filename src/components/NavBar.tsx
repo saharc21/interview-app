@@ -9,7 +9,7 @@ const Links = () => (
   </LinksSection>
 );
 
-const NavBar: React.FC = () => {
+const NavBar = () => {
   return (
     <NavBarContainer>
       <div

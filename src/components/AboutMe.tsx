@@ -7,7 +7,7 @@ import styled from "@emotion/styled";
 import { motion } from "framer-motion";
 import { CustomAvatarImg } from "../app/common";
 
-const AboutMe: React.FC = () => {
+const AboutMe = () => {
   return (
     <motion.div
       style={{
