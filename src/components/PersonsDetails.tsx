@@ -19,7 +19,7 @@ export interface UserInfo {
 export interface ResultProps {
   results: UserInfo[];
 }
-
+//ss
 const PersonsDetails: React.FC = () => {
   const [wholeUsersData, setWholeUsersdata] = useState<ResultProps[]>([]);
   const [fullName, setFullName] = useState<string>("");
