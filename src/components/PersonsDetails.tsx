@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import axios from "axios";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { CustomButton, CustomText } from "../app/common";
 import PersonNewCard from "./PersonCard";
 
@@ -20,19 +20,17 @@ export interface ResultProps {
   results: UserInfo[];
 }
 
-const PersonsDetails = () => {
-  const [wholeUsersData, setWholeUsersdata] = useState<ResultProps[]>([
-    { results: [] },
-  ]);
+const PersonsDetails: React.FC = () => {
+  const [wholeUsersData, setWholeUsersdata] = useState<ResultProps[]>([]);
+  const [fullName, setFullName] = useState<string>("");
   const [nextPageNumber, setNextPageNumber] = useState<number>(1);
-  const [openAddContactModal, setOpenAddContactModal] =
-    useState<boolean>(false);
   const [newPerson, setNewPerson] = useState<ResultProps>({
     results: [
       { name: { first: "", last: "", title: "" }, picture: { thumbnail: "" } },
     ],
   });
-  const [fullName, setFullName] = useState<string>("");
+  const [openAddContactModal, setOpenAddContactModal] =
+    useState<boolean>(false);
 
   const fetchRandomData = (pageNumber: number) => {
     return axios
@@ -48,9 +46,10 @@ const PersonsDetails = () => {
       });
   };
 
-  const addNewPersonToTheList = async () => {
+  const addNewPersonToTheList = () => {
     const formattedName = fullName.split(" ");
-    await setNewPerson({
+    setNewPerson({
+      //states -> issue
       results: [
         {
           name: {
@@ -62,13 +61,16 @@ const PersonsDetails = () => {
         },
       ],
     });
-    setWholeUsersdata([...wholeUsersData, newPerson]);
     setFullName("");
   };
 
-  // useEffect(() => {
-  //   fetchRandomData(nextPageNumber);
-  // }, []);
+  useEffect(() => {
+    fetchRandomData(nextPageNumber);
+  }, []);
+
+  useEffect(() => {
+    setWholeUsersdata([...wholeUsersData, newPerson]);
+  }, [newPerson]);
 
   return (
     <Container>
@@ -109,7 +111,10 @@ const PersonsDetails = () => {
               borderRadius: "50%",
               border: "solid 1px black",
             }}
-            onClick={() => setOpenAddContactModal(false)}
+            onClick={() => {
+              setFullName("");
+              setOpenAddContactModal(false);
+            }}
           >
             Cancel
           </button>

@@ -1,12 +1,17 @@
 import styled from "@emotion/styled";
-import React, { useEffect } from "react";
+import React, { FC, useEffect } from "react";
 import { useState } from "react";
 import { CustomButton, CustomText } from "../../app/common";
 import { CounterContainer } from "./common";
 
-const Counter = () => {
-  const [manualCounter, setManualCounter] = useState<number>(0);
-  const [autoCounter, setAutoCounter] = useState<number>(0);
+type Props = {
+  name?: string;
+  age?: number;
+};
+
+const Counter: FC<Props> = ({ name, age }) => {
+  const [manualCounter, setManualCounter] = useState(0);
+  const [autoCounter, setAutoCounter] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
