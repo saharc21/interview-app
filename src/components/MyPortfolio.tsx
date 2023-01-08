@@ -7,7 +7,7 @@ import {
   RoutePaths,
 } from "../app/common";
 
-const MyPortfolio: React.FC = () => {
+const MyPortfolio = () => {
   return (
     <PortfolioContainer
       initial={{ y: 10, opacity: 0 }}

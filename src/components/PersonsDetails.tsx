@@ -19,8 +19,8 @@ export interface UserInfo {
 export interface ResultProps {
   results: UserInfo[];
 }
-//ss
-const PersonsDetails: React.FC = () => {
+
+const PersonsDetails = () => {
   const [wholeUsersData, setWholeUsersdata] = useState<ResultProps[]>([]);
   const [fullName, setFullName] = useState<string>("");
   const [nextPageNumber, setNextPageNumber] = useState<number>(1);
@@ -121,9 +121,6 @@ const PersonsDetails: React.FC = () => {
           <button
             style={{
               width: "fit-content",
-              // position: "absolute",
-              // right: "2px",
-              // top: "2px",
               borderRadius: "50%",
               border: "solid 1px black",
             }}
@@ -178,7 +175,6 @@ const AddContactModal = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
-  // justify-content: center;
   background-color: grey;
   height: 300px;
   width: 200px;
