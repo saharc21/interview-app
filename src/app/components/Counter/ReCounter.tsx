@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useState } from "react";
 import { decrement, increment, incrementByAmount } from "./counterSlice";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { CustomButton, CustomInput, CustomText } from "../../app/common";
-import { CounterContainer } from "./common";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { CustomButton, CustomInput, CustomText } from "../../common.styles";
+import { CounterContainer } from "./Counter.styled";
 
 export function ReCounter() {
   const [userNumber, setUserNumber] = useState<number>(0);
@@ -15,11 +15,7 @@ export function ReCounter() {
 
   return (
     <CounterContainer>
-      <CustomText
-        fontFamily="'Montserrat', sans-serif"
-        color="white"
-        weight="600"
-      >
+      <CustomText color="white" weight="600">
         Counter with global state by Redux
       </CustomText>
       <div style={{ display: "flex", flexDirection: "column" }}>

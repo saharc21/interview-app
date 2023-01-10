@@ -1,11 +1,9 @@
-// interface AboutMeProps {
-//   name?: string;
-//   age?: number;
-// }
-
-import styled from "@emotion/styled";
 import { motion } from "framer-motion";
-import { CustomAvatarImg } from "../app/common";
+import styled from "@emotion/styled";
+import { CustomAvatarImg } from "../common.styles";
+
+// Fix - Move hardcoded texts to utils file.
+// elements with styles to styles comp.
 
 const AboutMe = () => {
   return (
