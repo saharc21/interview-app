@@ -1,8 +1,14 @@
 import styled from "@emotion/styled";
 import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
-import { CustomButton, CustomText } from "../app/common";
+import { CustomButton, CustomText } from "../common.styles";
 import PersonNewCard from "./PersonCard";
+
+// Fix - Move all data interfaces to Person.ts file (example)
+// Importent! remove types that not interfaces.
+// change whole to all.
+// maybe add filters & sorts (gender, etc.) -> https://randomuser.me/documentation
+// maybe add error notification, small modal at the left bottom.
 
 export interface UserName {
   first: string;
@@ -16,60 +22,53 @@ export interface UserInfo {
   name: UserName;
   picture: PicProps;
 }
-export interface ResultProps {
+export interface UsersData {
   results: UserInfo[];
 }
 
 const PersonsDetails = () => {
-  const [wholeUsersData, setWholeUsersdata] = useState<ResultProps[]>([]);
-  const [fullName, setFullName] = useState<string>("");
-  const [nextPageNumber, setNextPageNumber] = useState<number>(1);
-  const [newPerson, setNewPerson] = useState<ResultProps>({
-    results: [
-      { name: { first: "", last: "", title: "" }, picture: { thumbnail: "" } },
-    ],
-  });
-  const [openAddContactModal, setOpenAddContactModal] =
-    useState<boolean>(false);
+  const initailPageNumber = 1;
 
-  const fetchRandomData = (pageNumber: number) => {
-    return axios
-      .get(`https://randomuser.me/api?page=${pageNumber}`)
-      .then((res) => {
-        // handle success
-        setWholeUsersdata([...wholeUsersData, res.data]);
+  const [nextPageNumber, setNextPageNumber] = useState(initailPageNumber);
+  const [fullName, setFullName] = useState("");
+  const [openAddContactModal, setOpenAddContactModal] = useState(false);
+
+  const [wholeUsersData, setWholeUsersdata] = useState<UserInfo[]>([]);
+  const [newPerson, setNewPerson] = useState<UserInfo | null>(null);
+
+  const fetchRandomData = (pageNumber: number) =>
+    axios
+      .get<UsersData>(`https://randomuser.me/api?results=5&page=${pageNumber}`)
+      .then(({ data }) => {
+        setWholeUsersdata([...wholeUsersData, ...data.results]);
         setNextPageNumber(nextPageNumber + 1);
       })
-      .catch((err) => {
-        // handle error
-        console.error(err);
-      });
-  };
+      .catch((err) => console.error(err));
 
   const addNewPersonToTheList = () => {
     const formattedName = fullName.split(" ");
     setNewPerson({
       //states -> issue
-      results: [
-        {
-          name: {
-            first: formattedName[0] || "",
-            last: formattedName[1] || "",
-            title: "",
-          },
-          picture: { thumbnail: "" },
-        },
-      ],
+      name: {
+        first: formattedName[0] || "",
+        last: formattedName[1] || "",
+        title: "",
+      },
+      picture: { thumbnail: "" },
     });
     setFullName("");
   };
 
   useEffect(() => {
-    fetchRandomData(nextPageNumber);
+    if (initailPageNumber === nextPageNumber) {
+      fetchRandomData(initailPageNumber);
+    }
   }, []);
 
   useEffect(() => {
-    setWholeUsersdata([...wholeUsersData, newPerson]);
+    if (newPerson) {
+      setWholeUsersdata([...wholeUsersData, newPerson]);
+    }
   }, [newPerson]);
 
   return (
@@ -81,16 +80,14 @@ const PersonsDetails = () => {
         </CustomButton>
       </CustomText>
       <PersonCardsContainer>
-        {wholeUsersData.map((item) =>
-          item.results?.map((details, id) => (
-            <PersonNewCard
-              key={id}
-              age="27"
-              name={details.name.first + " " + details.name.last}
-              thumbnail={details.picture.thumbnail}
-            />
-          ))
-        )}
+        {wholeUsersData.map(({ name, picture }, id) => (
+          <PersonNewCard
+            key={id}
+            age="27"
+            name={name.first + " " + name.last}
+            thumbnail={picture.thumbnail}
+          />
+        ))}
       </PersonCardsContainer>
       {!!openAddContactModal && (
         <AddContactModal>
@@ -154,7 +151,6 @@ const PersonCardsContainer = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  border: solid 2px aliceblue;
   align-items: center;
   justify-content: center;
 `;

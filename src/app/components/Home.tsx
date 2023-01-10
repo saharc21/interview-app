@@ -23,6 +23,5 @@ const HomeContainer = styled(motion.div)`
   width: 100%;
   color: aliceblue;
   text-shadow: black 1px 0 4px;
-  font-family: montserrat, san-serif;
   font-size: 35px;
 `;

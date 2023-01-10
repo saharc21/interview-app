@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
 import React, { FC, useEffect } from "react";
 import { useState } from "react";
-import { CustomButton, CustomText } from "../../app/common";
-import { CounterContainer } from "./common";
+import { CustomButton, CustomText } from "../../common.styles";
+import { CounterContainer } from "./Counter.styled";
 
 type Props = {
   name?: string;
@@ -22,37 +22,23 @@ const Counter: FC<Props> = ({ name, age }) => {
 
   return (
     <CounterContainer>
-      <CustomText
-        fontFamily="'Montserrat', sans-serif"
-        color="white"
-        weight="600"
-      >
+      <CustomText color="white" weight="600">
         Ex 1 - Counters by Hooks{" "}
       </CustomText>
       <span style={{ display: "flex" }}>
         <CounterItem>
-          <CustomText
-            fontFamily="'Montserrat', sans-serif"
-            color="white"
-            weight="600"
-          >
+          <CustomText color="white" weight="600">
             Manual Counter
           </CustomText>
-          <CustomText color="white" fontFamily="'Montserrat', sans-serif">
+          <CustomText color="white">
             {"pressed " + manualCounter + " times"}
           </CustomText>
         </CounterItem>
         <CounterItem>
-          <CustomText
-            fontFamily="'Montserrat', sans-serif"
-            color="white"
-            weight="600"
-          >
+          <CustomText color="white" weight="600">
             Auto Counter
           </CustomText>
-          <CustomText color="white" fontFamily="'Montserrat', sans-serif">
-            {autoCounter + " sec"}
-          </CustomText>
+          <CustomText color="white">{autoCounter + " sec"}</CustomText>
         </CounterItem>
       </span>
 
