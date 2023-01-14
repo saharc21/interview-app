@@ -25,10 +25,12 @@ export const CustomText = styled.label<{
   color?: string;
   weight?: string;
   fontSize?: number;
+  textShadow?: string;
 }>`
   color: ${({ color }) => (color ? color : "black")};
   font-weight: ${({ weight }) => (weight ? weight : "400")};
   font-size: ${({ fontSize }) => (fontSize ? fontSize + "px" : "auto")};
+  text-shadow: ${({textShadow})=> (textShadow ? textShadow : '')};
 `;
 
 export const CustomAvatarImg = styled.img<{ sizeOfAvatar: number }>`
