@@ -5,8 +5,7 @@ import { CustomButton, CustomText } from "../common.styles";
 import PersonNewCard from "./PersonCard";
 
 // Fix - Move all data interfaces to Person.ts file (example)
-// Importent! remove types that not interfaces.
-// change whole to all.
+// Important! remove types that not interfaces.
 // maybe add filters & sorts (gender, etc.) -> https://randomuser.me/documentation
 // maybe add error notification, small modal at the left bottom.
 
@@ -33,14 +32,14 @@ const PersonsDetails = () => {
   const [fullName, setFullName] = useState("");
   const [openAddContactModal, setOpenAddContactModal] = useState(false);
 
-  const [wholeUsersData, setWholeUsersdata] = useState<UserInfo[]>([]);
+  const [allUsersData, setWholeUsersdata] = useState<UserInfo[]>([]);
   const [newPerson, setNewPerson] = useState<UserInfo | null>(null);
 
   const fetchRandomData = (pageNumber: number) =>
     axios
       .get<UsersData>(`https://randomuser.me/api?results=5&page=${pageNumber}`)
       .then(({ data }) => {
-        setWholeUsersdata([...wholeUsersData, ...data.results]);
+        setWholeUsersdata([...allUsersData, ...data.results]);
         setNextPageNumber(nextPageNumber + 1);
       })
       .catch((err) => console.error(err));
@@ -48,7 +47,6 @@ const PersonsDetails = () => {
   const addNewPersonToTheList = () => {
     const formattedName = fullName.split(" ");
     setNewPerson({
-      //states -> issue
       name: {
         first: formattedName[0] || "",
         last: formattedName[1] || "",
@@ -67,20 +65,20 @@ const PersonsDetails = () => {
 
   useEffect(() => {
     if (newPerson) {
-      setWholeUsersdata([...wholeUsersData, newPerson]);
+      setWholeUsersdata([...allUsersData, newPerson]);
     }
   }, [newPerson]);
 
   return (
     <Container>
       <CustomText>
-        Ex 2 - Fetch API data
-        <CustomButton onClick={() => fetchRandomData(nextPageNumber)}>
-          Get another user info
-        </CustomButton>
+        Fetch API data
       </CustomText>
+      <CustomButton onClick={() => fetchRandomData(nextPageNumber)}>
+          Get another user info
+      </CustomButton>
       <PersonCardsContainer>
-        {wholeUsersData.map(({ name, picture }, id) => (
+        {allUsersData.map(({ name, picture }, id) => (
           <PersonNewCard
             key={id}
             age="27"
@@ -102,9 +100,6 @@ const PersonsDetails = () => {
           <button
             style={{
               width: "fit-content",
-              // position: "absolute",
-              // right: "2px",
-              // top: "2px",
               borderRadius: "50%",
               border: "solid 1px black",
             }}

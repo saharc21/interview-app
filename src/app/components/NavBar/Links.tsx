@@ -1,13 +1,12 @@
 import styled from "@emotion/styled";
 import { CustomLink } from "../../common.styles";
-
-// Fix - Use Enum (already have that) for the links.
+import { RoutePaths } from "../../routes/Routes";
 
 export const Links = () => (
   <LinksSection>
-    <CustomLink to="/">Home</CustomLink>
-    <CustomLink to="/about">Who am I?</CustomLink>
-    <CustomLink to="/my-portfolio">My Portfolio</CustomLink>
+    <CustomLink to={RoutePaths.Home}>Home</CustomLink>
+    <CustomLink to={RoutePaths.AboutMe}>Who am I?</CustomLink>
+    <CustomLink to={RoutePaths.MyPortfolio}>My Portfolio</CustomLink>
   </LinksSection>
 );
 
