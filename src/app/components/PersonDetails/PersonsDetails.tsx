@@ -1,7 +1,10 @@
 import styled from "@emotion/styled";
 import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
-import { CustomButton, CustomText } from "../common.styles";
+import { CustomButton, CustomText } from "../../common.styles";
+import BackButton from "../BackButton";
+import { splitFullNameByFirstAndLast } from "../utils";
+import { UserInfo, UsersData } from "./Person";
 import PersonNewCard from "./PersonCard";
 
 // Fix - Move all data interfaces to Person.ts file (example)
@@ -9,27 +12,12 @@ import PersonNewCard from "./PersonCard";
 // maybe add filters & sorts (gender, etc.) -> https://randomuser.me/documentation
 // maybe add error notification, small modal at the left bottom.
 
-export interface UserName {
-  first: string;
-  last: string;
-  title: string;
-}
-export interface PicProps {
-  thumbnail: string;
-}
-export interface UserInfo {
-  name: UserName;
-  picture: PicProps;
-}
-export interface UsersData {
-  results: UserInfo[];
-}
-
 const PersonsDetails = () => {
   const initailPageNumber = 1;
 
   const [nextPageNumber, setNextPageNumber] = useState(initailPageNumber);
   const [fullName, setFullName] = useState("");
+  const [searchName, setSearchName] = useState<string[]>([]);
   const [openAddContactModal, setOpenAddContactModal] = useState(false);
 
   const [allUsersData, setWholeUsersdata] = useState<UserInfo[]>([]);
@@ -37,7 +25,9 @@ const PersonsDetails = () => {
 
   const fetchRandomData = (pageNumber: number) =>
     axios
-      .get<UsersData>(`https://randomuser.me/api?results=5&page=${pageNumber}`)
+      .get<UsersData>(
+        `https://randomuser.me/api?results=100&page=${pageNumber}`
+      )
       .then(({ data }) => {
         setWholeUsersdata([...allUsersData, ...data.results]);
         setNextPageNumber(nextPageNumber + 1);
@@ -53,6 +43,7 @@ const PersonsDetails = () => {
         title: "",
       },
       picture: { thumbnail: "" },
+      dob: { date: "", age: 17 },
     });
     setFullName("");
   };
@@ -69,26 +60,74 @@ const PersonsDetails = () => {
     }
   }, [newPerson]);
 
+  const [femaleIsChecked, setFemaleIsChecked] = useState(false);
+  const [maleIsChecked, setMaleIsChecked] = useState(false);
   return (
     <Container>
-      <CustomText>
-        Fetch API data
-      </CustomText>
+      <CustomText>Fetch API data</CustomText>
       <CustomButton onClick={() => fetchRandomData(nextPageNumber)}>
-          Get another user info
+        Get another user info
       </CustomButton>
+      <SearchBarContainer>
+        {/* search bar */}
+        <input
+          type="text"
+          placeholder="Search by typping name"
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setSearchName(splitFullNameByFirstAndLast(e.target.value))
+          }
+        />
+        <input
+          className="femaleGender"
+          type="checkbox"
+          checked={femaleIsChecked}
+          onClick={() => setFemaleIsChecked(!femaleIsChecked)}
+        ></input>
+        <label>Female</label>
+        <input
+          className="maleGender"
+          type="checkbox"
+          checked={maleIsChecked}
+          onClick={() => setMaleIsChecked(!maleIsChecked)}
+        ></input>
+        <label>Male</label>
+
+        {/* <someDropDownCheckbox></someDropDownCheckbox> */}
+      </SearchBarContainer>
       <PersonCardsContainer>
-        {allUsersData.map(({ name, picture }, id) => (
-          <PersonNewCard
-            key={id}
-            age="27"
-            name={name.first + " " + name.last}
-            thumbnail={picture.thumbnail}
-          />
-        ))}
+        {allUsersData.map(({ name, picture, dob }, id) =>
+          searchName.length === 1 && searchName[0] !== "" ? (
+            name.first.includes(searchName[0]) && (
+              <PersonNewCard
+                key={id}
+                age={dob.age.toString()}
+                name={name.first + " " + name.last}
+                thumbnail={picture.thumbnail}
+              />
+            )
+          ) : searchName.length === 2 ? (
+            name.first === searchName[0] &&
+            name.last.includes(searchName[1]) && (
+              <PersonNewCard
+                key={id}
+                age={dob.age.toString()}
+                name={name.first + " " + name.last}
+                thumbnail={picture.thumbnail}
+              />
+            )
+          ) : (
+            <PersonNewCard
+              key={id}
+              age={dob.age.toString()}
+              name={name.first + " " + name.last}
+              thumbnail={picture.thumbnail}
+            />
+          )
+        )}
       </PersonCardsContainer>
       {!!openAddContactModal && (
         <AddContactModal>
+          {/* <AddPersonDetailsModal></AddPersonDetailsModal> */}
           <input
             type="string"
             value={fullName}
@@ -123,6 +162,7 @@ const PersonsDetails = () => {
           >
             Accept
           </button>
+          <BackButton />
         </AddContactModal>
       )}
       <AddContactButton onClick={() => setOpenAddContactModal(true)}>
@@ -139,7 +179,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   margin-top: 10px;
-  overflow: scroll;
+  overflow: auto;
 `;
 
 const PersonCardsContainer = styled.div`
@@ -170,4 +210,11 @@ const AddContactModal = styled.form`
   height: 300px;
   width: 200px;
   z-index: 1;
+`;
+
+const SearchBarContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  background-color: red;
+  width: 100%;
 `;

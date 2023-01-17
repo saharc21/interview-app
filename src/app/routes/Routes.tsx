@@ -1,8 +1,8 @@
 import { Route, Routes as RoutesCore, useLocation } from "react-router-dom";
-import AboutMe from "../components/AboutMe";
+import AboutMe from "../components/AboutMe/AboutMe";
 import Home from "../components/Home";
 import MyPortfolio from "../components/MyPortfolio";
-import PersonDetails from "../components/PersonsDetails";
+import PersonDetails from "../components/PersonDetails/PersonsDetails";
 import { ReCounter } from "../components/Counter/ReCounter";
 import Counter from "../components/Counter/Counter";
 // import { AnimatePresence } from "framer-motion";

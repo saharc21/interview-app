@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { CustomAvatarImg } from "../common.styles";
+import { CustomAvatarImg } from "../../common.styles";
 
 interface PersonCardProps {
   age?: string;

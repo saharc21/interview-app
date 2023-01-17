@@ -21,5 +21,20 @@ implemention is the best way to get indication about your writing code.
     affected in many components in our app tree.
     `;
 
+export const SaharAvatarImage = `https://serving.photos.photobox.com/60902681b2a2bbe70c5e2f826e2a7f9aa2cc694b16b23169c6fc240cc7f5bdb67c199c7c.jpg`;
 
-    export const SaharAvatarImage = `https://serving.photos.photobox.com/60902681b2a2bbe70c5e2f826e2a7f9aa2cc694b16b23169c6fc240cc7f5bdb67c199c7c.jpg`;
+export const capitalFirstCharacter = (someString: string) => {
+  const newString = someString.charAt(0).toUpperCase() + someString.slice(1);
+  console.log({ 2: newString });
+  return newString;
+};
+
+export const splitFullNameByFirstAndLast = (fullname: string) => {
+  const formatterString = fullname.split(" ");
+  console.log({ 1: formatterString });
+  const newF = formatterString.map((nameItem) =>
+    capitalFirstCharacter(nameItem)
+  );
+  console.log({ 3: newF });
+  return newF;
+};
