@@ -1,9 +1,18 @@
 import { useHref, useLocation } from "react-router";
 import { useNavigate } from "react-router-dom";
 import { CustomButton } from "../common.styles";
-const BackButton = () => {
+
+interface Props {
+  widthOfBtn: string;
+}
+
+const BackButton = ({ widthOfBtn }: Props) => {
   let history = useNavigate();
-  return <CustomButton onClick={() => history(-1)}>Go back</CustomButton>;
+  return (
+    <CustomButton style={{ width: widthOfBtn }} onClick={() => history(-1)}>
+      Go back
+    </CustomButton>
+  );
 };
 
 export default BackButton;

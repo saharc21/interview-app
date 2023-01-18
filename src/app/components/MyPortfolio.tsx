@@ -4,7 +4,6 @@ import { RoutePaths } from "../routes/Routes";
 import { CustomLink, CustomText, ListItemContainer } from "../common.styles";
 
 // Fix - Color file inside App folder.
-//  maybe back buttons to the inside pages.
 
 const MyPortfolio = () => (
   <PortfolioContainer

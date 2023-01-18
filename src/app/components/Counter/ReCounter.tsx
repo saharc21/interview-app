@@ -3,6 +3,7 @@ import { decrement, increment, incrementByAmount } from "./counterSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { CustomButton, CustomInput, CustomText } from "../../common.styles";
 import { CounterContainer } from "./Counter.styled";
+import BackButton from "../BackButton";
 
 export function ReCounter() {
   const [userNumber, setUserNumber] = useState<number>(0);
@@ -15,6 +16,7 @@ export function ReCounter() {
 
   return (
     <CounterContainer>
+      <BackButton widthOfBtn="100px" />
       <CustomText color="white" weight="600">
         Counter with global state by Redux
       </CustomText>
