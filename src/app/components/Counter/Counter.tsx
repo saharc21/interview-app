@@ -1,6 +1,7 @@
-import React, { FC, useEffect } from "react";
+import { FC, useEffect } from "react";
 import { useState } from "react";
 import { CustomButton, CustomText } from "../../common.styles";
+import BackButton from "../BackButton";
 import { CounterContainer, CounterItem } from "./Counter.styled";
 
 type Props = {
@@ -21,6 +22,7 @@ const Counter: FC<Props> = ({ name, age }) => {
 
   return (
     <CounterContainer>
+      <BackButton width="100px" />
       <CustomText color="white" weight="600">
         Ex 1 - Counters by Hooks{" "}
       </CustomText>
@@ -49,5 +51,3 @@ const Counter: FC<Props> = ({ name, age }) => {
 };
 
 export default Counter;
-
-
