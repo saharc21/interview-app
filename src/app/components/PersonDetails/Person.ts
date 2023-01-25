@@ -3,7 +3,7 @@ export interface UserName {
   last: string;
   title?: string;
 }
-export interface PicProps {
+export interface Picture {
   thumbnail: string;
 }
 export interface DateDetails {
@@ -12,12 +12,18 @@ export interface DateDetails {
 }
 export interface UserInfo {
   name: UserName;
-  picture: PicProps;
+  picture: Picture;
   dob: DateDetails;
-  gender: Gender.MaleCode | Gender.FemaleCode;
+  gender: Gender;
 }
 export interface UsersData {
   results: UserInfo[];
+}
+
+export interface PersonCardDetails {
+  age?: string;
+  name?: string;
+  thumbnail?: string;
 }
 
 export enum Gender {
@@ -27,4 +33,5 @@ export enum Gender {
   MaleCode = "male",
   AllDescription = "All",
   AllCode = "all",
+  Undefined = "Other",
 }

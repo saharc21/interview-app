@@ -4,9 +4,16 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { CustomButton, CustomInput, CustomText } from "../../common.styles";
 import BackButton from "../BackButton";
 import Dropdown, { DropDownType } from "../Dropdown";
-import { splitFullNameByFirstAndLast } from "../utils";
+import NotificationShow, { NotificationType } from "../NotficationShow";
+import {
+  FemaleAvatarIcon,
+  MaleAvatarIcon,
+  splitFullNameByFirstAndLast,
+  UndefinedAvatarIcon,
+} from "../utils";
 import { Gender, UserInfo, UsersData } from "./Person";
 import PersonNewCard from "./PersonCard";
+import RadioButtonsList, { Option } from "./RadioButtonsList";
 
 // Important! remove types that not interfaces.
 // maybe add filters & sorts (gender, etc.) -> https://randomuser.me/documentation
@@ -17,9 +24,9 @@ const PersonsDetails = () => {
 
   const [nextPageNumber, setNextPageNumber] = useState(initailPageNumber);
 
-  const [fullName, setFullName] = useState("");
-  const [age, setAge] = useState<number | undefined>(undefined);
-  const [picturePath, setPicturePath] = useState("");
+  const [newFullName, setNewFullName] = useState("");
+  const [newAge, setNewAge] = useState(0);
+  const [newPicturePath, setNewPicturePath] = useState("");
 
   const [searchName, setSearchName] = useState<string[]>([]);
   const [openAddContactModal, setOpenAddContactModal] = useState(false);
@@ -49,20 +56,21 @@ const PersonsDetails = () => {
       .catch((err) => console.error(err));
 
   const addNewPersonToTheList = () => {
-    const formattedName = fullName.split(" ");
+    const formattedName = splitFullNameByFirstAndLast(newFullName);
     setNewPerson({
       name: {
         first: formattedName[0] || "",
         last: formattedName[1] || "",
         title: "",
       },
-      picture: { thumbnail: picturePath },
-      dob: { date: "", age: age as number },
-      gender: Gender.MaleCode,
+      picture: { thumbnail: newPicturePath },
+      dob: { date: "", age: newAge as number },
+      gender: selectedGender,
     });
-    setFullName("");
-    setAge(undefined);
-    setPicturePath("");
+
+    setNewFullName("");
+    setNewAge(0);
+    setNewPicturePath("");
   };
 
   const setCheckedBoxes = (gender: string) => {
@@ -112,22 +120,51 @@ const PersonsDetails = () => {
         break;
     }
   };
-
   useEffect(() => {
     if (initailPageNumber === nextPageNumber) {
       fetchRandomData(initailPageNumber);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (newPerson) {
-      setAllUsersdata([...allUsersData, newPerson]);
+      setAllUsersdata((allUsersData) => [...allUsersData, newPerson]);
     }
   }, [newPerson]);
 
+  const [selectedGender, setSelectedGender] = useState(Gender.Undefined);
+
+  const genderArray: Option[] = [
+    {
+      optionDescription: Gender.MaleDescription,
+      onClick: () => {
+        setSelectedGender(Gender.MaleDescription);
+      },
+      optionIcon: MaleAvatarIcon,
+    },
+    {
+      optionDescription: Gender.FemaleDescription,
+      onClick: () => {
+        setSelectedGender(Gender.FemaleDescription);
+      },
+      optionIcon: FemaleAvatarIcon,
+    },
+    {
+      optionDescription: Gender.Undefined,
+      onClick: () => {
+        setSelectedGender(Gender.Undefined);
+      },
+      optionIcon: UndefinedAvatarIcon,
+    },
+  ];
+
+  const [successfulNotfication, setSuccessfulNotfication] = useState(false);
+  const [errorNotfication, setErrorNotfication] = useState(false);
+
   return (
     <Container>
-      <BackButton widthOfBtn="100px" />
+      <BackButton width="100px" />
       <CustomText>Fetch API data</CustomText>
       <CustomButton onClick={() => fetchRandomData(nextPageNumber)}>
         Get another user info
@@ -255,58 +292,70 @@ const PersonsDetails = () => {
           )}
       </PersonCardsContainer>
       {!!openAddContactModal && (
-        <AddContactModal>
-          <CustomInput
-            type="string"
-            value={fullName}
-            placeholder="Insert full name"
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setFullName(e.target.value)
-            }
-          />
-          <CustomInput
-            type="number"
-            value={age}
-            placeholder="Insert age"
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setAge(parseInt(e.target.value))
-            }
-          />
-          <CustomInput
-            type="string"
-            value={picturePath}
-            placeholder="Insert picture url path"
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setPicturePath(e.target.value)
-            }
-          />
-          <CustomInput
-            type="string"
-            value={picturePath}
-            placeholder="Insert picture url path"
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setPicturePath(e.target.value)
-            }
-          />
-          <CustomButton
-            onClick={() => {
-              setFullName("");
-              setAge(undefined);
-              setPicturePath("");
-              setOpenAddContactModal(false);
-            }}
-          >
-            Cancel
-          </CustomButton>
-          <CustomButton
-            onClick={() => {
-              addNewPersonToTheList();
-              setOpenAddContactModal(false);
-            }}
-          >
-            Accept
-          </CustomButton>
+        <AddContactModal
+          onSubmit={() => {
+            addNewPersonToTheList();
+            setSuccessfulNotfication(true);
+            setOpenAddContactModal(false);
+          }}
+        >
+          <InputsSection>
+            <CustomInput
+              type="string"
+              value={newFullName}
+              placeholder="Insert full name"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setNewFullName(e.target.value);
+              }}
+              required
+            />
+            <CustomInput
+              type="number"
+              value={newAge}
+              placeholder="Insert age"
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setNewAge(parseInt(e.target.value))
+              }
+            />
+            <CustomInput
+              type="string"
+              value={newPicturePath}
+              placeholder="Insert picture url path"
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setNewPicturePath(e.target.value)
+              }
+            />
+          </InputsSection>
+
+          <RadioButtonsList optionsArray={genderArray} />
+          <ActionButtonsSection>
+            <CustomButton
+              onClick={() => {
+                setNewFullName("");
+                setNewAge(0);
+                setNewPicturePath("");
+                setOpenAddContactModal(false);
+              }}
+            >
+              Cancel
+            </CustomButton>
+            <CustomButton type="submit">Accept</CustomButton>
+          </ActionButtonsSection>
         </AddContactModal>
+      )}
+      {!!errorNotfication && (
+        <NotificationShow
+          description="Please fill the full name of your person"
+          type={NotificationType.ErrorNoitication}
+          onClose={() => setErrorNotfication(false)}
+        />
+      )}
+      {!!successfulNotfication && (
+        <NotificationShow
+          description="Your details saved successfully"
+          type={NotificationType.SuccessNotification}
+          onClose={() => setSuccessfulNotfication(false)}
+        />
       )}
       <AddContactButton onClick={() => setOpenAddContactModal(true)}>
         +
@@ -343,21 +392,30 @@ const AddContactButton = styled.button`
   z-index: 1;
 `;
 
-const AddContactModal = styled.form`
-  position: absolute;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: grey;
-  height: 300px;
-  width: 200px;
-  z-index: 1;
-`;
-
 const SearchBarContainer = styled.div`
   display: flex;
   justify-content: center;
   background-color: none;
   width: 100%;
 `;
+
+const AddContactModal = styled.form`
+  height: 400px;
+  width: 300px;
+  position: absolute;
+  background-color: white;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  border: 5px solid black;
+  border-radius: 15px;
+  // box-shadow: 0px 5px 6px black;
+  // -webkit-box-shadow: 0px 5px 6px black;
+  // -moz-box-shadow: 0px 5px 6px black;
+  z-index: 1;
+`;
+
+const ActionButtonsSection = styled.div``;
+const InputsSection = styled.div``;

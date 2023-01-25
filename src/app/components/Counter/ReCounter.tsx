@@ -16,7 +16,7 @@ export function ReCounter() {
 
   return (
     <CounterContainer>
-      <BackButton widthOfBtn="100px" />
+      <BackButton width="100px" />
       <CustomText color="white" weight="600">
         Counter with global state by Redux
       </CustomText>

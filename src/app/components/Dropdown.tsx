@@ -41,8 +41,8 @@ const Dropdown = ({ title, menu, typeOfDropDown }: Props) => {
       {!!open && (
         <Menu>
           {typeOfDropDown === DropDownType.ButtonsList &&
-            menu.map((menuItem, index) => (
-              <li key={index} className="menu-item">
+            menu.map((menuItem, idx) => (
+              <li key={idx} className="menu-item">
                 <button
                   onClick={() => {
                     menuItem.onClick();
@@ -59,14 +59,14 @@ const Dropdown = ({ title, menu, typeOfDropDown }: Props) => {
                 flexDirection: "column",
               }}
             >
-              {menu.map((menuItem, index) => (
+              {menu.map((menuItem, idx) => (
                 <div
+                  key={idx}
                   style={{
                     display: "flex",
                   }}
                 >
                   <input
-                    key={index}
                     type="checkbox"
                     checked={menuItem.isChecked}
                     onClick={menuItem.onClick}

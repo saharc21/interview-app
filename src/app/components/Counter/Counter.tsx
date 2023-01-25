@@ -22,7 +22,7 @@ const Counter: FC<Props> = ({ name, age }) => {
 
   return (
     <CounterContainer>
-      <BackButton widthOfBtn="100px" />
+      <BackButton width="100px" />
       <CustomText color="white" weight="600">
         Ex 1 - Counters by Hooks{" "}
       </CustomText>

@@ -1,23 +1,11 @@
 import styled from "@emotion/styled";
-import { CustomAvatarImg } from "../../common.styles";
+import { PersonCardDetails } from "./Person";
 
-interface PersonCardProps {
-  age?: string;
-  name?: string;
-  thumbnail?: string;
-}
-
-const PersonCard: React.FC<PersonCardProps> = ({ age, name, thumbnail }) => {
+const PersonCard: React.FC<PersonCardDetails> = ({ age, name, thumbnail }) => {
   return (
     <PersonCardContainer>
       <PersonCardLoad thumbnail={thumbnail} />
 
-      {/* <CustomAvatarImg
-        src="https://serving.photos.photobox.com/60902681b2a2bbe70c5e2f826e2a7f9aa2cc694b16b23169c6fc240cc7f5bdb67c199c7c.jpg"
-        alt="Sahar"
-        sizeOfAvatar={40}
-        style={{ marginRight: "15px", marginLeft: "30px" }}
-      /> */}
       <PerosnCardTitle>{name ? name : "Person name"}</PerosnCardTitle>
       <PersonCardDescription>
         Age: {age ? age : "Person age"}

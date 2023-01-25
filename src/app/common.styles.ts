@@ -30,7 +30,7 @@ export const CustomText = styled.label<{
   color: ${({ color }) => (color ? color : "black")};
   font-weight: ${({ weight }) => (weight ? weight : "400")};
   font-size: ${({ fontSize }) => (fontSize ? fontSize + "px" : "auto")};
-  text-shadow: ${({textShadow})=> (textShadow ? textShadow : '')};
+  text-shadow: ${({ textShadow }) => (textShadow ? textShadow : "")};
 `;
 
 export const CustomAvatarImg = styled.img<{ sizeOfAvatar: number }>`
@@ -42,6 +42,16 @@ export const CustomAvatarImg = styled.img<{ sizeOfAvatar: number }>`
   border-radius: 190px;
   -webkit-border-radius: 190px;
   -moz-border-radius: 190px;
+`;
+
+export const CustomAvatarIcon = styled.img<{ sizeOfAvatar: number }>`
+  width: ${({ sizeOfAvatar }) => (sizeOfAvatar ? sizeOfAvatar : 150) + "px"};
+  border: 1px solid black;
+  border-radius: 50%;
+  padding: 8px;
+  box-shadow: 0px 3px 10px #ccc;
+  -webkit-box-shadow: 0px 3px 10px #ccc;
+  -moz-box-shadow: 0px 3px 10px #ccc;
 `;
 
 export const ListItemContainer = styled.div`
