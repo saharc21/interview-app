@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { CustomButton } from "../common.styles";
+import { CustomButton } from "../../common.styles";
 
 interface ButtonStyle {
   width: string;

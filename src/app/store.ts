@@ -1,15 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import counterReducer from "./components/Counter/counterSlice";
-
-// export default configureStore({
-//   reducer: {
-//     counter: counterReducer,
-//   },
-// });
-
+import successfullReducer from "./components/Helpers/succesfullSlice";
+import failureReducer from "./components/Helpers/failureSlice";
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
+    successfull: successfullReducer,
+    failure: failureReducer,
   },
 });
 

@@ -2,17 +2,17 @@ import styled from "@emotion/styled";
 import { useState } from "react";
 import { CustomAvatarIcon } from "../../common.styles";
 
-export interface Option {
+export interface RadioOptionItem {
   optionDescription: string;
+  optionCode: string;
   isChecked?: boolean;
   optionIcon?: string;
   onClick: () => void;
 }
 
 export interface OptionsList {
-  optionsArray: Option[];
+  optionsArray: RadioOptionItem[];
 }
-
 const RadioButtonsList = ({ optionsArray }: OptionsList) => {
   const [selectedOption, setSelectedOption] = useState("");
   return (
@@ -36,9 +36,12 @@ const RadioButtonsList = ({ optionsArray }: OptionsList) => {
           />
           <input
             type={"radio"}
-            value={optionItem.optionDescription}
-            checked={optionItem.optionDescription === selectedOption}
-            onClick={() => setSelectedOption(optionItem.optionDescription)}
+            value={optionItem.optionCode}
+            checked={optionItem.optionCode === selectedOption}
+            onClick={() => {
+              optionItem.onClick();
+              setSelectedOption(optionItem.optionCode);
+            }}
             readOnly
           />
           <label>{optionItem.optionDescription}</label>

@@ -1,6 +1,15 @@
-import { OptionsList } from "./RadioButtonsList";
+export interface CheckboxOptionItem {
+  optionDescription: string;
+  optionCode: string;
+  isChecked: boolean;
+  onClick: () => void;
+}
 
-const CheckBoxList = ({ optionsArray }: OptionsList) => {
+export interface CheckBoxOptionsList {
+  optionsArray: CheckboxOptionItem[];
+}
+
+const CheckBoxList = ({ optionsArray }: CheckBoxOptionsList) => {
   return (
     <div>
       {optionsArray.map((optionItem, idx) => (

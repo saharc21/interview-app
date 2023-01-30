@@ -1,7 +1,7 @@
 import { FC, useEffect } from "react";
 import { useState } from "react";
 import { CustomButton, CustomText } from "../../common.styles";
-import BackButton from "../BackButton";
+import BackButton from "../Helpers/BackButton";
 import { CounterContainer, CounterItem } from "./Counter.styled";
 
 type Props = {

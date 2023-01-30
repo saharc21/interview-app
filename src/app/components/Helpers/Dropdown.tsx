@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { useState } from "react";
-import { arrowToRightSvgXmlns, capitalFirstCharacter } from "./utils";
+import { arrowToRightSvgXmlns, capitalFirstCharacter } from "../utils";
 
 interface MenuItem {
   description: string;
@@ -88,6 +88,7 @@ export default Dropdown;
 
 const DropDown = styled("div")<ModalProp>`
   position: relative;
+  z-index: 1;
 
   button {
     width: 100%;
@@ -118,7 +119,6 @@ const Menu = styled.ul`
 
   border: 1px solid grey;
   width: 150px;
-  z-index: 3;
 
   li {
     margin: 0;

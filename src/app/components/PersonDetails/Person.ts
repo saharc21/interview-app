@@ -33,5 +33,7 @@ export enum Gender {
   MaleCode = "male",
   AllDescription = "All",
   AllCode = "all",
-  Undefined = "Other",
+  OtherCode = "other",
+  OtherDescription = "Other",
+  Undefined = "undefined",
 }

@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import styled from "@emotion/styled";
-import { CustomText } from "../common.styles";
+import { CustomText } from "../../common.styles";
 
 export enum NotificationType {
-  ErrorNoitication = "error",
-  SuccessNotification = "success",
+  FailureNoitication = "Failure",
+  SuccessNotification = "Success",
 }
 
 interface Notification {
@@ -17,10 +17,11 @@ const NotificationShow = ({ description, type, onClose }: Notification) => {
   useEffect(() => {
     const interval = setInterval(() => {
       onClose();
-    }, 1000);
+    }, 2000);
     return () => {
       clearInterval(interval);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -31,7 +32,7 @@ const NotificationShow = ({ description, type, onClose }: Notification) => {
         color="white"
         textShadow="white 1px 0 5px"
       >
-        {type === NotificationType.ErrorNoitication ? "Error" : "Success"}
+        {type}
       </CustomText>
       <CustomText style={{ marginTop: "10px" }} color="white">
         {description}
@@ -49,7 +50,7 @@ const NotificationContainer = styled("div")<{ type: NotificationType }>`
   flex-direction: column;
   align-items: center;
   background-color: ${(prop) =>
-    prop.type === NotificationType.ErrorNoitication ? "red" : "green"};
+    prop.type === NotificationType.FailureNoitication ? "red" : "green"};
   color: white;
   min-height: 150px;
   width: 350px;

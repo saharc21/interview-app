@@ -2,9 +2,9 @@ import styled from "@emotion/styled";
 import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
 import { CustomButton, CustomInput, CustomText } from "../../common.styles";
-import BackButton from "../BackButton";
-import Dropdown, { DropDownType } from "../Dropdown";
-import NotificationShow, { NotificationType } from "../NotficationShow";
+import BackButton from "../Helpers/BackButton";
+import Dropdown, { DropDownType } from "../Helpers/Dropdown";
+import NotificationShow, { NotificationType } from "../Helpers/NotficationShow";
 import {
   FemaleAvatarIcon,
   MaleAvatarIcon,
@@ -13,29 +13,38 @@ import {
 } from "../utils";
 import { Gender, UserInfo, UsersData } from "./Person";
 import PersonNewCard from "./PersonCard";
-import RadioButtonsList, { Option } from "./RadioButtonsList";
-
-// Important! remove types that not interfaces.
-// maybe add filters & sorts (gender, etc.) -> https://randomuser.me/documentation
-// maybe add error notification, small modal at the left bottom.
+import { RadioOptionItem } from "../CustomForm/RadioButtonsList";
+import CustomForm from "../CustomForm/CustomForm";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { changeSuccessfullValue } from "../Helpers/succesfullSlice";
+import { changeFailureValue } from "../Helpers/failureSlice";
+import { InputOptionItem } from "../CustomForm/InputsList";
 
 const PersonsDetails = () => {
   const initailPageNumber = 1;
-
   const [nextPageNumber, setNextPageNumber] = useState(initailPageNumber);
-
-  const [newFullName, setNewFullName] = useState("");
-  const [newAge, setNewAge] = useState(0);
-  const [newPicturePath, setNewPicturePath] = useState("");
-
-  const [searchName, setSearchName] = useState<string[]>([]);
-  const [openAddContactModal, setOpenAddContactModal] = useState(false);
 
   const [allUsersData, setAllUsersdata] = useState<UserInfo[]>([]);
   const [newPerson, setNewPerson] = useState<UserInfo | null>(null);
 
+  //successfull-failure global state
+  const failureNotification = useAppSelector((state) => state.failure.value);
+  const successfulNotfication = useAppSelector(
+    (state) => state.successfull.value
+  );
+  const dispatch = useAppDispatch();
+
+  //new person states
+  const [openAddPersonModal, setOpenAddPersonModal] = useState(false);
+  const [newFullName, setNewFullName] = useState("");
+  const [newAge, setNewAge] = useState(0);
+  const [newPicturePath, setNewPicturePath] = useState("");
+
+  //filters states
+  const [searchName, setSearchName] = useState<string[]>([]);
   const [femaleIsChecked, setFemaleIsChecked] = useState(false);
   const [maleIsChecked, setMaleIsChecked] = useState(false);
+  const [otherIsChecked, setOtherIsChecked] = useState(false);
   const [allIsChecked, setAllIsChecked] = useState(false);
 
   const isMaleOnly = !!maleIsChecked && !femaleIsChecked;
@@ -43,7 +52,84 @@ const PersonsDetails = () => {
   const isAllGender = !!allIsChecked || (!femaleIsChecked && !maleIsChecked);
   const searchByFirstName = searchName.length === 1 && searchName[0] !== "";
   const searchByFullName = searchName.length === 2;
-  const [currentChoice, setCurrentChoice] = useState("Gender");
+  const [currentGenderFilterTitle, setCurrentGenderFilterTitle] =
+    useState("Gender");
+  const [selectedGender, setSelectedGender] = useState(Gender.Undefined);
+
+  const gendersOptions: RadioOptionItem[] = [
+    {
+      optionDescription: Gender.MaleDescription,
+      optionCode: Gender.MaleCode,
+      onClick: () => {
+        setSelectedGender(Gender.MaleCode);
+      },
+      optionIcon: MaleAvatarIcon,
+    },
+    {
+      optionDescription: Gender.FemaleDescription,
+      optionCode: Gender.FemaleCode,
+      onClick: () => {
+        setSelectedGender(Gender.FemaleCode);
+      },
+      optionIcon: FemaleAvatarIcon,
+    },
+    {
+      optionDescription: Gender.OtherDescription,
+      optionCode: Gender.OtherCode,
+      onClick: () => {
+        setSelectedGender(Gender.OtherCode);
+      },
+      optionIcon: UndefinedAvatarIcon,
+    },
+  ];
+
+  const personDetailsOptions: InputOptionItem[] = [
+    {
+      type: "string",
+      value: newFullName,
+      inputName: "Full Name",
+      onChange: (value: string) => setNewFullName(value),
+      required: true,
+    },
+    {
+      type: "number",
+      value: newAge,
+      inputName: "Age",
+      onChange: (value: number) => setNewAge(value),
+      required: false,
+    },
+    {
+      type: "string",
+      value: newPicturePath,
+      inputName: "Picture Url",
+      onChange: (value: string) => setNewPicturePath(value),
+      required: false,
+    },
+  ];
+
+  const genderFilterOptions = [
+    {
+      description: Gender.MaleDescription,
+      onClick: () => setGenderDropDownCheckBoxes(Gender.MaleCode),
+      isChecked: maleIsChecked,
+    },
+    {
+      description: Gender.FemaleDescription,
+      onClick: () => setGenderDropDownCheckBoxes(Gender.FemaleCode),
+      isChecked: femaleIsChecked,
+    },
+    {
+      description: Gender.OtherDescription,
+      onClick: () => setGenderDropDownCheckBoxes(Gender.OtherCode),
+      isChecked: otherIsChecked,
+    },
+    {
+      description: Gender.AllDescription,
+      onClick: () => setGenderDropDownCheckBoxes(Gender.AllCode),
+      isChecked: allIsChecked,
+    },
+  ];
+
   const fetchRandomData = (pageNumber: number) =>
     axios
       .get<UsersData>(
@@ -54,6 +140,12 @@ const PersonsDetails = () => {
         setNextPageNumber(nextPageNumber + 1);
       })
       .catch((err) => console.error(err));
+
+  const resetFormValues = () => {
+    setNewFullName("");
+    setNewAge(0);
+    setNewPicturePath("");
+  };
 
   const addNewPersonToTheList = () => {
     const formattedName = splitFullNameByFirstAndLast(newFullName);
@@ -67,42 +159,43 @@ const PersonsDetails = () => {
       dob: { date: "", age: newAge as number },
       gender: selectedGender,
     });
-
-    setNewFullName("");
-    setNewAge(0);
-    setNewPicturePath("");
+    resetFormValues();
   };
 
-  const setCheckedBoxes = (gender: string) => {
+  const setGenderDropDownCheckBoxes = (gender: string) => {
     switch (gender) {
       case Gender.MaleCode:
         if (allIsChecked === false && femaleIsChecked === false) {
-          if (maleIsChecked) setCurrentChoice(Gender.AllDescription);
-          else setCurrentChoice(Gender.MaleDescription);
+          if (maleIsChecked) {
+            setCurrentGenderFilterTitle(Gender.AllDescription);
+          } else {
+            setCurrentGenderFilterTitle(Gender.MaleDescription);
+          }
           setMaleIsChecked((prev) => !prev);
         } else if (allIsChecked === false && femaleIsChecked === true) {
           setMaleIsChecked(true);
           setAllIsChecked(true);
-          setCurrentChoice(Gender.AllDescription);
+          setCurrentGenderFilterTitle(Gender.AllDescription);
         } else if (allIsChecked === true) {
           setMaleIsChecked(false);
           setAllIsChecked(false);
-          setCurrentChoice(Gender.FemaleDescription);
+          setCurrentGenderFilterTitle(Gender.FemaleDescription);
         }
         break;
       case Gender.FemaleCode:
         if (allIsChecked === false && maleIsChecked === false) {
-          if (femaleIsChecked) setCurrentChoice(Gender.AllDescription);
-          else setCurrentChoice(Gender.FemaleDescription);
+          if (femaleIsChecked)
+            setCurrentGenderFilterTitle(Gender.AllDescription);
+          else setCurrentGenderFilterTitle(Gender.FemaleDescription);
           setFemaleIsChecked((prev) => !prev);
         } else if (allIsChecked === false && maleIsChecked === true) {
           setFemaleIsChecked(true);
           setAllIsChecked(true);
-          setCurrentChoice(Gender.AllDescription);
+          setCurrentGenderFilterTitle(Gender.AllDescription);
         } else if (allIsChecked === true) {
           setFemaleIsChecked(false);
           setAllIsChecked(false);
-          setCurrentChoice(Gender.MaleDescription);
+          setCurrentGenderFilterTitle(Gender.MaleDescription);
         }
         break;
       case Gender.AllCode:
@@ -110,12 +203,12 @@ const PersonsDetails = () => {
           setAllIsChecked(true);
           setFemaleIsChecked(true);
           setMaleIsChecked(true);
-          setCurrentChoice(Gender.AllDescription);
+          setCurrentGenderFilterTitle(Gender.AllDescription);
         } else if (allIsChecked === true) {
           setAllIsChecked(false);
           setFemaleIsChecked(false);
           setMaleIsChecked(false);
-          setCurrentChoice("Gender");
+          setCurrentGenderFilterTitle("Gender");
         }
         break;
     }
@@ -133,34 +226,14 @@ const PersonsDetails = () => {
     }
   }, [newPerson]);
 
-  const [selectedGender, setSelectedGender] = useState(Gender.Undefined);
+  // useEffect(() => {
+  //   console.log({ allUsersData });
+  // }, [allUsersData]);
 
-  const genderArray: Option[] = [
-    {
-      optionDescription: Gender.MaleDescription,
-      onClick: () => {
-        setSelectedGender(Gender.MaleDescription);
-      },
-      optionIcon: MaleAvatarIcon,
-    },
-    {
-      optionDescription: Gender.FemaleDescription,
-      onClick: () => {
-        setSelectedGender(Gender.FemaleDescription);
-      },
-      optionIcon: FemaleAvatarIcon,
-    },
-    {
-      optionDescription: Gender.Undefined,
-      onClick: () => {
-        setSelectedGender(Gender.Undefined);
-      },
-      optionIcon: UndefinedAvatarIcon,
-    },
-  ];
-
-  const [successfulNotfication, setSuccessfulNotfication] = useState(false);
-  const [errorNotfication, setErrorNotfication] = useState(false);
+  //fix gender filter - other option.
+  //fix - components animations
+  //fix - find best using of successfull and failure states - notifications
+  //fix - check search user pattern works well to remove some extra conditions
 
   return (
     <Container>
@@ -176,26 +249,12 @@ const PersonsDetails = () => {
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setSearchName(splitFullNameByFirstAndLast(e.target.value))
           }
+          // pattern="([A-Za-z]+\s)([A-Za-z]+)(\s)?"
+          title="Full Name has to contain First and Last name while space seperate between them"
         />
         <Dropdown
-          title={currentChoice}
-          menu={[
-            {
-              description: Gender.MaleDescription,
-              onClick: () => setCheckedBoxes(Gender.MaleCode),
-              isChecked: maleIsChecked,
-            },
-            {
-              description: Gender.FemaleDescription,
-              onClick: () => setCheckedBoxes(Gender.FemaleCode),
-              isChecked: femaleIsChecked,
-            },
-            {
-              description: Gender.AllDescription,
-              onClick: () => setCheckedBoxes(Gender.AllCode),
-              isChecked: allIsChecked,
-            },
-          ]}
+          title={currentGenderFilterTitle}
+          menu={genderFilterOptions}
           typeOfDropDown={DropDownType.Checkbox}
         />
       </SearchBarContainer>
@@ -291,73 +350,36 @@ const PersonsDetails = () => {
                 )
           )}
       </PersonCardsContainer>
-      {!!openAddContactModal && (
-        <AddContactModal
+      {!!openAddPersonModal && (
+        <CustomForm
           onSubmit={() => {
             addNewPersonToTheList();
-            setSuccessfulNotfication(true);
-            setOpenAddContactModal(false);
+            dispatch(changeSuccessfullValue());
+            setOpenAddPersonModal(false);
           }}
-        >
-          <InputsSection>
-            <CustomInput
-              type="string"
-              value={newFullName}
-              placeholder="Insert full name"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setNewFullName(e.target.value);
-              }}
-              required
-            />
-            <CustomInput
-              type="number"
-              value={newAge}
-              placeholder="Insert age"
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setNewAge(parseInt(e.target.value))
-              }
-            />
-            <CustomInput
-              type="string"
-              value={newPicturePath}
-              placeholder="Insert picture url path"
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setNewPicturePath(e.target.value)
-              }
-            />
-          </InputsSection>
-
-          <RadioButtonsList optionsArray={genderArray} />
-          <ActionButtonsSection>
-            <CustomButton
-              onClick={() => {
-                setNewFullName("");
-                setNewAge(0);
-                setNewPicturePath("");
-                setOpenAddContactModal(false);
-              }}
-            >
-              Cancel
-            </CustomButton>
-            <CustomButton type="submit">Accept</CustomButton>
-          </ActionButtonsSection>
-        </AddContactModal>
+          onClose={() => {
+            setOpenAddPersonModal(false);
+            resetFormValues();
+          }}
+          radioOptions={gendersOptions}
+          inputOptions={personDetailsOptions}
+        ></CustomForm>
       )}
-      {!!errorNotfication && (
+      {!!failureNotification && (
         <NotificationShow
           description="Please fill the full name of your person"
-          type={NotificationType.ErrorNoitication}
-          onClose={() => setErrorNotfication(false)}
+          type={NotificationType.FailureNoitication}
+          onClose={() => dispatch(changeFailureValue())}
         />
       )}
       {!!successfulNotfication && (
         <NotificationShow
           description="Your details saved successfully"
           type={NotificationType.SuccessNotification}
-          onClose={() => setSuccessfulNotfication(false)}
+          onClose={() => dispatch(changeSuccessfullValue())}
         />
       )}
-      <AddContactButton onClick={() => setOpenAddContactModal(true)}>
+      <AddContactButton onClick={() => setOpenAddPersonModal(true)}>
         +
       </AddContactButton>
     </Container>
@@ -398,24 +420,3 @@ const SearchBarContainer = styled.div`
   background-color: none;
   width: 100%;
 `;
-
-const AddContactModal = styled.form`
-  height: 400px;
-  width: 300px;
-  position: absolute;
-  background-color: white;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  border: 5px solid black;
-  border-radius: 15px;
-  // box-shadow: 0px 5px 6px black;
-  // -webkit-box-shadow: 0px 5px 6px black;
-  // -moz-box-shadow: 0px 5px 6px black;
-  z-index: 1;
-`;
-
-const ActionButtonsSection = styled.div``;
-const InputsSection = styled.div``;
