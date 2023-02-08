@@ -1,4 +1,7 @@
+import dayjs, { Dayjs } from "dayjs";
 import Parser from "html-react-parser";
+import { ChangeEvent, useState } from "react";
+import { InputOptionItem } from "./CustomForm/InputsList";
 
 export const AboutMeTitle = Parser(`So who am I ?`);
 
@@ -23,16 +26,16 @@ implemention is the best way to get indication about your writing code.
     affected in many components in our app tree.
     `);
 
+//avatars and icons
 export const SaharAvatarImage = `https://serving.photos.photobox.com/60902681b2a2bbe70c5e2f826e2a7f9aa2cc694b16b23169c6fc240cc7f5bdb67c199c7c.jpg`;
-
 export const MaleAvatarIcon = `https://icon-library.com/images/male-icon-png/male-icon-png-8.jpg`;
 export const FemaleAvatarIcon = `https://cdn-icons-png.flaticon.com/512/1864/1864588.png`;
 export const UndefinedAvatarIcon = `https://www.iconpacks.net/icons/2/free-agender-symbol-icon-2243-thumb.png`;
-
 export const arrowToRightSvgXmlns =
   Parser(`<svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px">
 <path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293 7.293 4.707z" />
 </svg>`);
+
 export const capitalFirstCharacter = (someString: string) => {
   const newString = someString.charAt(0).toUpperCase() + someString.slice(1);
   return newString;
@@ -44,4 +47,52 @@ export const splitFullNameByFirstAndLast = (fullname: string) => {
     capitalFirstCharacter(nameItem)
   );
   return formatterName;
+};
+
+export enum InputType {
+  String = "string",
+  Number = "number",
+  Date = "date",
+}
+export const getInitialValueByInputType = (inputType: InputType) => {
+  switch (inputType) {
+    case InputType.Date:
+      return dayjs();
+    case InputType.String:
+      return "";
+    case InputType.Number:
+      return 0;
+  }
+};
+
+export const useNewInputForm = (
+  inputType: InputType,
+  inputName: string,
+  required?: boolean,
+  pattern?: string,
+  title?: string
+) => {
+  const [value, setValue] = useState<Dayjs | string | number>(
+    getInitialValueByInputType(inputType)
+  );
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+
+  const resetValue = () => {
+    setValue(getInitialValueByInputType(inputType));
+  };
+
+  const newInput: InputOptionItem = {
+    value: value,
+    type: inputType,
+    inputName: inputName,
+    required: required || false,
+    pattern: pattern || "",
+    title: title || "",
+    resetValue: () => resetValue(),
+    onChange: inputType === InputType.Date ? (e) => setValue(e) : handleChange,
+  };
+  return newInput;
 };

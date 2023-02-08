@@ -7,9 +7,11 @@ import Dropdown, { DropDownType } from "../Helpers/Dropdown";
 import NotificationShow, { NotificationType } from "../Helpers/NotficationShow";
 import {
   FemaleAvatarIcon,
+  InputType,
   MaleAvatarIcon,
   splitFullNameByFirstAndLast,
   UndefinedAvatarIcon,
+  useNewInputForm,
 } from "../utils";
 import { Gender, UserInfo, UsersData } from "./Person";
 import PersonNewCard from "./PersonCard";
@@ -34,11 +36,23 @@ const PersonsDetails = () => {
   );
   const dispatch = useAppDispatch();
 
-  //new person states
+  //new person form states
   const [openAddPersonModal, setOpenAddPersonModal] = useState(false);
-  const [newFullName, setNewFullName] = useState("");
-  const [newAge, setNewAge] = useState(0);
-  const [newPicturePath, setNewPicturePath] = useState("");
+  const fullNameInput = useNewInputForm(
+    InputType.String,
+    "Full Name",
+    true,
+    "([A-Za-z]+\\s)([A-Za-z]+(\\s)?)",
+    "Full Name has to contain First and Last name while space seperates between them"
+  );
+  const ageInput = useNewInputForm(InputType.Number, "Age");
+  const dateOfBirthInput = useNewInputForm(InputType.Date, "Date Of Birth");
+  const pictureUrlInput = useNewInputForm(InputType.String, "Picture Url");
+  const personDetailsOptions: InputOptionItem[] = [
+    fullNameInput,
+    dateOfBirthInput,
+    pictureUrlInput,
+  ];
 
   //filters states
   const [searchName, setSearchName] = useState<string[]>([]);
@@ -83,30 +97,6 @@ const PersonsDetails = () => {
     },
   ];
 
-  const personDetailsOptions: InputOptionItem[] = [
-    {
-      type: "string",
-      value: newFullName,
-      inputName: "Full Name",
-      onChange: (value: string) => setNewFullName(value),
-      required: true,
-    },
-    {
-      type: "number",
-      value: newAge,
-      inputName: "Age",
-      onChange: (value: number) => setNewAge(value),
-      required: false,
-    },
-    {
-      type: "string",
-      value: newPicturePath,
-      inputName: "Picture Url",
-      onChange: (value: string) => setNewPicturePath(value),
-      required: false,
-    },
-  ];
-
   const genderFilterOptions = [
     {
       description: Gender.MaleDescription,
@@ -142,24 +132,27 @@ const PersonsDetails = () => {
       .catch((err) => console.error(err));
 
   const resetFormValues = () => {
-    setNewFullName("");
-    setNewAge(0);
-    setNewPicturePath("");
+    fullNameInput.resetValue();
+    ageInput.resetValue();
+    pictureUrlInput.resetValue();
   };
 
   const addNewPersonToTheList = () => {
-    const formattedName = splitFullNameByFirstAndLast(newFullName);
+    const formattedName = splitFullNameByFirstAndLast(
+      fullNameInput.value as string
+    );
     setNewPerson({
       name: {
         first: formattedName[0] || "",
         last: formattedName[1] || "",
         title: "",
       },
-      picture: { thumbnail: newPicturePath },
-      dob: { date: "", age: newAge as number },
+      picture: { thumbnail: pictureUrlInput.value as string },
+      dob: { date: "", age: ageInput.value as number },
       gender: selectedGender,
     });
     resetFormValues();
+    
   };
 
   const setGenderDropDownCheckBoxes = (gender: string) => {
@@ -226,10 +219,6 @@ const PersonsDetails = () => {
     }
   }, [newPerson]);
 
-  // useEffect(() => {
-  //   console.log({ allUsersData });
-  // }, [allUsersData]);
-
   //fix gender filter - other option.
   //fix - components animations
   //fix - find best using of successfull and failure states - notifications
@@ -237,27 +226,57 @@ const PersonsDetails = () => {
 
   return (
     <Container>
-      <BackButton width="100px" />
-      <CustomText>Fetch API data</CustomText>
-      <CustomButton onClick={() => fetchRandomData(nextPageNumber)}>
-        Get another user info
-      </CustomButton>
-      <SearchBarContainer>
-        <CustomInput
-          type="text"
-          placeholder="Search by typping name"
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setSearchName(splitFullNameByFirstAndLast(e.target.value))
-          }
-          // pattern="([A-Za-z]+\s)([A-Za-z]+)(\s)?"
-          title="Full Name has to contain First and Last name while space seperate between them"
-        />
-        <Dropdown
-          title={currentGenderFilterTitle}
-          menu={genderFilterOptions}
-          typeOfDropDown={DropDownType.Checkbox}
-        />
-      </SearchBarContainer>
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          justifyContent: "space-around",
+        }}
+      >
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <BackButton width="100px" />
+        </span>
+        <span
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <CustomText>Fetch API data</CustomText>
+          <CustomButton onClick={() => fetchRandomData(nextPageNumber)}>
+            Get another user info
+          </CustomButton>
+        </span>
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <SearchBarContainer>
+            <CustomInput
+              type="text"
+              placeholder="Search by typping name"
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setSearchName(splitFullNameByFirstAndLast(e.target.value))
+              }
+              pattern="([A-Za-z]+\s)([A-Za-z]+)(\s)?"
+              title="Full Name has to contain First and Last name while space seperate between them"
+            />
+            <Dropdown
+              title={currentGenderFilterTitle}
+              menu={genderFilterOptions}
+              typeOfDropDown={DropDownType.Checkbox}
+            />
+          </SearchBarContainer>
+        </span>
+      </div>
       <PersonCardsContainer>
         {isAllGender &&
           allUsersData.map(({ name, picture, dob }, id) =>
@@ -402,6 +421,7 @@ const PersonCardsContainer = styled.div`
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  overflow: auto;
 `;
 
 const AddContactButton = styled.button`

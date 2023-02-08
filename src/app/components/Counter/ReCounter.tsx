@@ -1,4 +1,4 @@
-import  { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { decrement, increment, incrementByAmount } from "./counterSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { CustomButton, CustomInput, CustomText } from "../../common.styles";
@@ -9,10 +9,6 @@ export function ReCounter() {
   const [userNumber, setUserNumber] = useState<number>(0);
   const count = useAppSelector((state) => state.counter.value);
   const dispatch = useAppDispatch();
-
-  const incrementByNumber = (number: number) => {
-    dispatch(incrementByAmount(number));
-  };
 
   return (
     <CounterContainer>
@@ -43,7 +39,7 @@ export function ReCounter() {
             setUserNumber(parseInt(e.target.value) || 0)
           }
         />
-        <CustomButton onClick={() => incrementByNumber(userNumber)}>
+        <CustomButton onClick={() => dispatch(incrementByAmount(userNumber))}>
           Click to increase your counter
         </CustomButton>
         <label>Current Value: </label>
